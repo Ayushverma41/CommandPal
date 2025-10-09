@@ -7,7 +7,8 @@ import { ConversationHistory, type Message } from '@/components/ConversationHist
 import { useChatHistory, type Conversation } from '@/hooks/use-chat-history';
 import { HistorySidebar } from '@/components/HistorySidebar';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu } from 'lucide-react';
+import { ModeToggle } from '@/components/mode-toggle';
 
 export default function ClientPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -130,7 +131,7 @@ export default function ClientPage() {
         onClearAll={clearAllConversations}
       />
       <div className="flex flex-col flex-1">
-        <header className="flex items-center justify-between p-4 border-b shrink-0 md:justify-end">
+        <header className="flex items-center justify-between p-4 border-b shrink-0">
           <Button
             variant="ghost"
             size="icon"
@@ -141,7 +142,7 @@ export default function ClientPage() {
             <Menu className="h-6 w-6" />
           </Button>
           <h1 className="text-xl font-semibold font-headline md:hidden">CommandPal</h1>
-          <div className="w-9 h-9"></div>
+          <ModeToggle />
         </header>
         
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
