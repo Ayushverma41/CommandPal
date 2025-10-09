@@ -2,14 +2,18 @@
 /**
  * @fileOverview A flow to simulate the execution of a terminal command.
  *
- * - executeCommandFlow - A function that takes a command and returns a simulated output.
+ * - executeCommand - A function that takes a command and returns a simulated output.
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { ExecuteCommandFlowInputSchema, ExecuteCommandFlowOutputSchema } from '@/ai/types';
 
-export const executeCommandFlow = ai.defineFlow(
+export async function executeCommand(input: string): Promise<string> {
+    return executeCommandFlow(input);
+}
+
+const executeCommandFlow = ai.defineFlow(
   {
     name: 'executeCommandFlow',
     inputSchema: ExecuteCommandFlowInputSchema,

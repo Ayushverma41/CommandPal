@@ -2,7 +2,7 @@
 
 import { interpretUserInput } from '@/ai/flows/interpret-user-input-for-command';
 import { z } from 'zod';
-import { executeCommandFlow } from '@/ai/flows/execute-command-flow';
+import { executeCommand as executeCommandFlow } from '@/ai/flows/execute-command-flow';
 
 const CommandOutputSchema = z.object({
   type: z.enum(['command', 'conversation']),
