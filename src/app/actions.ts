@@ -1,15 +1,16 @@
 'use server';
 
-import { improveCommandGenerationBasedOnHistory } from '@/ai/flows/improve-command-generation-based-on-history';
+import { interpretUserInput } from '@/ai/flows/interpret-user-input-for-command';
 import { z } from 'zod';
 
 const CommandOutputSchema = z.object({
-  terminalCommand: z.string(),
+  type: z.enum(['command', 'conversation']),
+  response: z.string(),
 });
 
 export async function getCommand(userInput: string, commandHistory: string[]) {
   try {
-    const result = await improveCommandGenerationBasedOnHistory({
+    const result = await interpretUserInput({
       userInput,
       commandHistory,
     });

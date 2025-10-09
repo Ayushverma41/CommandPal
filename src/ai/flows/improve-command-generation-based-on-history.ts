@@ -1,26 +1,13 @@
-// src/ai/flows/improve-command-generation-based-on-history.ts
 'use server';
 /**
  * @fileOverview Flow to improve command generation based on command history.
  *
  * - improveCommandGenerationBasedOnHistory - A function that takes user input and command history to improve command generation.
- * - ImproveCommandGenerationBasedOnHistoryInput - The input type for the improveCommandGenerationBasedOnHistory function.
- * - ImproveCommandGenerationBasedOnHistoryOutput - The return type for the improveCommandGenerationBasedOnHistory function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-const ImproveCommandGenerationBasedOnHistoryInputSchema = z.object({
-  userInput: z.string().describe('The user input in natural language.'),
-  commandHistory: z.array(z.string()).describe('The history of previously executed commands.'),
-});
-export type ImproveCommandGenerationBasedOnHistoryInput = z.infer<typeof ImproveCommandGenerationBasedOnHistoryInputSchema>;
-
-const ImproveCommandGenerationBasedOnHistoryOutputSchema = z.object({
-  terminalCommand: z.string().describe('The generated terminal command based on user input and command history.'),
-});
-export type ImproveCommandGenerationBasedOnHistoryOutput = z.infer<typeof ImproveCommandGenerationBasedOnHistoryOutputSchema>;
+import type { ImproveCommandGenerationBasedOnHistoryInput, ImproveCommandGenerationBasedOnHistoryOutput } from '@/ai/types';
+import { ImproveCommandGenerationBasedOnHistoryInputSchema, ImproveCommandGenerationBasedOnHistoryOutputSchema } from '@/ai/types';
 
 export async function improveCommandGenerationBasedOnHistory(input: ImproveCommandGenerationBasedOnHistoryInput): Promise<ImproveCommandGenerationBasedOnHistoryOutput> {
   return improveCommandGenerationBasedOnHistoryFlow(input);

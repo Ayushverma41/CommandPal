@@ -12,6 +12,7 @@ export type Message = {
   role: 'user' | 'assistant';
   text: string;
   isGenerating?: boolean;
+  type?: 'command' | 'conversation';
 };
 
 export default function ClientPage() {
@@ -36,21 +37,21 @@ export default function ClientPage() {
     setMessages(prev => [...prev, newUserMessage, newAssistantMessage]);
 
     const commandHistory = messages
-      .filter(m => m.role === 'assistant' && !m.isGenerating)
+      .filter(m => m.role === 'assistant' && !m.isGenerating && m.type === 'command')
       .map(m => m.text);
 
     try {
       const result = await getCommand(prompt, commandHistory);
       setMessages(prev =>
         prev.map(m =>
-          m.id === assistantMessageId ? { ...m, text: result.terminalCommand, isGenerating: false } : m
+          m.id === assistantMessageId ? { ...m, text: result.response, type: result.type, isGenerating: false } : m
         )
       );
     } catch (error) {
       console.error(error);
       setMessages(prev =>
         prev.map(m =>
-          m.id === assistantMessageId ? { ...m, text: 'Sorry, I had trouble generating a command. Please try again.', isGenerating: false } : m
+          m.id === assistantMessageId ? { ...m, text: 'Sorry, I had trouble generating a response. Please try again.', type: 'conversation', isGenerating: false } : m
         )
       );
     } finally {

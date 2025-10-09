@@ -1,44 +1,63 @@
 'use server';
 /**
- * @fileOverview This file defines a Genkit flow that interprets user input in natural language and generates the corresponding terminal command.
+ * @fileOverview This file defines a Genkit flow that interprets user input in natural language and generates the corresponding terminal command or a conversational response.
  *
- * - interpretUserInputForCommand - A function that takes user input and returns a terminal command.
- * - InterpretUserInputForCommandInput - The input type for the interpretUserInputForCommand function.
- * - InterpretUserInputForCommandOutput - The return type for the interpretUserInputForCommand function.
+ * - interpretUserInput - A function that takes user input and returns either a terminal command or a conversational response.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { improveCommandGenerationBasedOnHistory } from './improve-command-generation-based-on-history';
+import { conversational } from './conversational-flow';
+import type { InterpretUserInputForCommandInput, InterpretUserInputOutput } from '@/ai/types';
+import { InterpretUserInputForCommandInputSchema, InterpretUserInputOutputSchema } from '@/ai/types';
 
-const InterpretUserInputForCommandInputSchema = z.object({
-  userInput: z.string().describe('The user input in natural language.'),
+const InterpretUserInputSchema = z.object({
+  isCommand: z.boolean().describe('Whether the user input is a command or a conversational topic.'),
 });
-export type InterpretUserInputForCommandInput = z.infer<typeof InterpretUserInputForCommandInputSchema>;
 
-const InterpretUserInputForCommandOutputSchema = z.object({
-  terminalCommand: z.string().describe('The terminal command to execute based on the user input.'),
-});
-export type InterpretUserInputForCommandOutput = z.infer<typeof InterpretUserInputForCommandOutputSchema>;
-
-export async function interpretUserInputForCommand(input: InterpretUserInputForCommandInput): Promise<InterpretUserInputForCommandOutput> {
-  return interpretUserInputForCommandFlow(input);
+export async function interpretUserInput(input: InterpretUserInputForCommandInput): Promise<InterpretUserInputOutput> {
+  return interpretUserInputFlow(input);
 }
 
 const prompt = ai.definePrompt({
-  name: 'interpretUserInputForCommandPrompt',
-  input: {schema: InterpretUserInputForCommandInputSchema},
-  output: {schema: InterpretUserInputForCommandOutputSchema},
-  prompt: `You are a helpful assistant designed to translate natural language into terminal commands.\n\nGiven the following user input, generate the most appropriate terminal command to execute. Be intelligent and use flags or other installed tools if it will help fulfil the intent.\n\nUser Input: {{{userInput}}}`,
+  name: 'interpretUserInputPrompt',
+  input: {schema: z.object({userInput: z.string()})},
+  output: {schema: InterpretUserInputSchema},
+  prompt: `You are an expert at understanding user intent. The user is interacting with a tool that can generate terminal commands. Your task is to determine if the user is asking for a terminal command or just making small talk.
+
+  If the user is asking for a command (e.g., "list all files", "create a new directory"), respond with '{"isCommand": true}'.
+  If the user is just making small talk (e.g., "hello", "how are you?", "what's your name?"), respond with '{"isCommand": false}'.
+  
+  User Input: {{{userInput}}}`,
 });
 
-const interpretUserInputForCommandFlow = ai.defineFlow(
+const interpretUserInputFlow = ai.defineFlow(
   {
-    name: 'interpretUserInputForCommandFlow',
+    name: 'interpretUserInputFlow',
     inputSchema: InterpretUserInputForCommandInputSchema,
-    outputSchema: InterpretUserInputForCommandOutputSchema,
+    outputSchema: InterpretUserInputOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  async (input) => {
+    const { output: intent } = await prompt({ userInput: input.userInput });
+
+    if (intent?.isCommand) {
+      const commandResult = await improveCommandGenerationBasedOnHistory({
+        userInput: input.userInput,
+        commandHistory: input.commandHistory,
+      });
+      return {
+        type: 'command',
+        response: commandResult.terminalCommand,
+      };
+    } else {
+      const conversationalResult = await conversational({
+        userInput: input.userInput,
+      });
+      return {
+        type: 'conversation',
+        response: conversationalResult.response,
+      };
+    }
   }
 );

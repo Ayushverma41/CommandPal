@@ -35,7 +35,7 @@ function CopyButton({ command }: { command: string }) {
   );
 }
 
-function AssistantMessage({ text, isGenerating }: { text: string; isGenerating?: boolean }) {
+function AssistantMessage({ text, isGenerating, type }: { text: string; isGenerating?: boolean, type?: 'command' | 'conversation' }) {
   if (isGenerating) {
     return (
       <div className="flex items-center gap-2">
@@ -46,15 +46,21 @@ function AssistantMessage({ text, isGenerating }: { text: string; isGenerating?:
     );
   }
 
-  return (
-    <div className="bg-accent/10 p-4 rounded-lg relative group border border-accent/20">
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        <CopyButton command={text} />
+  if (type === 'command') {
+    return (
+      <div className="bg-accent/10 p-4 rounded-lg relative group border border-accent/20">
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton command={text} />
+        </div>
+        <pre className="text-sm font-code whitespace-pre-wrap text-accent-foreground/90">
+          <code className="language-bash">{text}</code>
+        </pre>
       </div>
-      <pre className="text-sm font-code whitespace-pre-wrap text-accent-foreground/90">
-        <code className="language-bash">{text}</code>
-      </pre>
-    </div>
+    );
+  }
+
+  return (
+    <p className="leading-relaxed">{text}</p>
   );
 }
 
@@ -67,7 +73,7 @@ export function ConversationHistory({ messages }: ConversationHistoryProps) {
         </div>
         <h2 className="text-2xl font-semibold font-headline">Welcome to CommandPal</h2>
         <p className="text-muted-foreground mt-2 max-w-sm">
-          Describe the task you want to accomplish, and I'll generate the terminal command for you.
+          Describe the task you want to accomplish, and I'll generate the terminal command for you. You can also just chat with me!
         </p>
       </div>
     );
@@ -90,7 +96,7 @@ export function ConversationHistory({ messages }: ConversationHistoryProps) {
               {message.role === 'user' ? (
                 <p className="leading-relaxed">{message.text}</p>
               ) : (
-                <AssistantMessage text={message.text} isGenerating={message.isGenerating} />
+                <AssistantMessage text={message.text} isGenerating={message.isGenerating} type={message.type} />
               )}
             </div>
           </div>
