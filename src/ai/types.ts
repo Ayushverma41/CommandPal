@@ -35,3 +35,9 @@ export const InterpretUserInputOutputSchema = z.object({
   response: z.string(),
 });
 export type InterpretUserInputOutput = z.infer<typeof InterpretUserInputOutputSchema>;
+
+export const ExecuteCommandFlowInputSchema = z.string().describe('The terminal command to execute.');
+export type ExecuteCommandFlowInput = z.infer<typeof ExecuteCommandFlowInputSchema>;
+
+export const ExecuteCommandFlowOutputSchema = z.string().describe('The simulated output of the executed command.');
+export type ExecuteCommandFlowOutput = z.infer<typeof ExecuteCommandFlowOutputSchema>;

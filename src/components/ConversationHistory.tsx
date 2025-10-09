@@ -4,12 +4,14 @@ import { useToast } from '@/hooks/use-toast';
 import type { Message } from '@/app/page-client';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Bot, User, Copy, Check } from 'lucide-react';
+import { Bot, User, Copy, Check, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
 type ConversationHistoryProps = {
   messages: Message[];
+  onExecuteCommand: (command: string) => void;
+  isExecuting: boolean;
 };
 
 function CopyButton({ command }: { command: string }) {
@@ -35,7 +37,18 @@ function CopyButton({ command }: { command: string }) {
   );
 }
 
-function AssistantMessage({ text, isGenerating, type }: { text: string; isGenerating?: boolean, type?: 'command' | 'conversation' }) {
+function ExecuteButton({ command, onExecute, isExecuting }: { command: string, onExecute: (command: string) => void, isExecuting: boolean }) {
+  if (!command) return null;
+
+  return (
+    <Button variant="ghost" size="icon" onClick={() => onExecute(command)} disabled={isExecuting} className="h-8 w-8 text-muted-foreground hover:text-foreground">
+      <Play className="h-4 w-4" />
+      <span className="sr-only">Execute command</span>
+    </Button>
+  );
+}
+
+function AssistantMessage({ text, isGenerating, type, onExecuteCommand, isExecuting }: { text: string; isGenerating?: boolean, type?: 'command' | 'conversation' | 'execution', onExecuteCommand: (command: string) => void, isExecuting: boolean }) {
   if (isGenerating) {
     return (
       <div className="flex items-center gap-2">
@@ -49,11 +62,22 @@ function AssistantMessage({ text, isGenerating, type }: { text: string; isGenera
   if (type === 'command') {
     return (
       <div className="bg-accent/10 p-4 rounded-lg relative group border border-accent/20">
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 flex opacity-0 group-hover:opacity-100 transition-opacity">
+          <ExecuteButton command={text} onExecute={onExecuteCommand} isExecuting={isExecuting} />
           <CopyButton command={text} />
         </div>
         <pre className="text-sm font-code whitespace-pre-wrap text-accent-foreground/90">
           <code className="language-bash">{text}</code>
+        </pre>
+      </div>
+    );
+  }
+
+  if (type === 'execution') {
+    return (
+      <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+        <pre className="text-sm font-code whitespace-pre-wrap text-gray-300">
+          <code>{text}</code>
         </pre>
       </div>
     );
@@ -64,7 +88,7 @@ function AssistantMessage({ text, isGenerating, type }: { text: string; isGenera
   );
 }
 
-export function ConversationHistory({ messages }: ConversationHistoryProps) {
+export function ConversationHistory({ messages, onExecuteCommand, isExecuting }: ConversationHistoryProps) {
   if (messages.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center pt-10">
@@ -96,7 +120,7 @@ export function ConversationHistory({ messages }: ConversationHistoryProps) {
               {message.role === 'user' ? (
                 <p className="leading-relaxed">{message.text}</p>
               ) : (
-                <AssistantMessage text={message.text} isGenerating={message.isGenerating} type={message.type} />
+                <AssistantMessage text={message.text} isGenerating={message.isGenerating} type={message.type} onExecuteCommand={onExecuteCommand} isExecuting={isExecuting}/>
               )}
             </div>
           </div>

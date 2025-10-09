@@ -4,3 +4,4 @@ config();
 import '@/ai/flows/interpret-user-input-for-command.ts';
 import '@/ai/flows/improve-command-generation-based-on-history.ts';
 import '@/ai/flows/conversational-flow.ts';
+import '@/ai/flows/execute-command-flow.ts';

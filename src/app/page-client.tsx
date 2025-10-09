@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { getCommand } from './actions';
+import { getCommand, executeCommand } from './actions';
 import { CommandForm } from '@/components/CommandForm';
 import { ConversationHistory } from '@/components/ConversationHistory';
 import { Button } from '@/components/ui/button';
@@ -12,12 +12,13 @@ export type Message = {
   role: 'user' | 'assistant';
   text: string;
   isGenerating?: boolean;
-  type?: 'command' | 'conversation';
+  type?: 'command' | 'conversation' | 'execution';
 };
 
 export default function ClientPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
   const conversationEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -58,6 +59,31 @@ export default function ClientPage() {
       setIsGenerating(false);
     }
   };
+  
+  const handleExecuteCommand = async (command: string) => {
+    setIsExecuting(true);
+    const assistantMessageId = Date.now().toString();
+    const newAssistantMessage: Message = { id: assistantMessageId, role: 'assistant', text: '', isGenerating: true };
+    setMessages(prev => [...prev, newAssistantMessage]);
+
+    try {
+      const result = await executeCommand(command);
+      setMessages(prev =>
+        prev.map(m =>
+          m.id === assistantMessageId ? { ...m, text: result, type: 'execution', isGenerating: false } : m
+        )
+      );
+    } catch (error) {
+       console.error(error);
+      setMessages(prev =>
+        prev.map(m =>
+          m.id === assistantMessageId ? { ...m, text: 'Sorry, I had trouble executing the command.', type: 'conversation', isGenerating: false } : m
+        )
+      );
+    } finally {
+      setIsExecuting(false);
+    }
+  };
 
   const clearHistory = () => {
     setMessages([]);
@@ -77,7 +103,7 @@ export default function ClientPage() {
 
       <main className="flex-1 overflow-y-auto p-4 md:p-6">
         <div className="max-w-3xl mx-auto w-full">
-            <ConversationHistory messages={messages} />
+            <ConversationHistory messages={messages} onExecuteCommand={handleExecuteCommand} isExecuting={isExecuting}/>
             <div ref={conversationEndRef} />
         </div>
       </main>
