@@ -1,13 +1,19 @@
-
 'use client';
 
 import { useToast } from '@/hooks/use-toast';
-import type { Message } from '@/app/page-client';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Bot, User, Copy, Check, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+
+export type Message = {
+  id: string;
+  role: 'user' | 'assistant';
+  text: string;
+  isGenerating?: boolean;
+  type?: 'command' | 'conversation' | 'execution';
+};
 
 type ConversationHistoryProps = {
   messages: Message[];
@@ -50,7 +56,7 @@ function ExecuteButton({ command, onExecute, isExecuting }: { command: string, o
 }
 
 function AssistantMessage({ text, isGenerating, type, onExecuteCommand, isExecuting }: { text: string; isGenerating?: boolean, type?: 'command' | 'conversation' | 'execution', onExecuteCommand: (command: string) => void, isExecuting: boolean }) {
-  if (isGenerating) {
+  if (isGenerating && !text) {
     return (
       <div className="flex items-center gap-2">
         <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce [animation-delay:-0.3s]"></div>
