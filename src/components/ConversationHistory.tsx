@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useToast } from '@/hooks/use-toast';
@@ -30,9 +31,9 @@ function CopyButton({ command }: { command: string }) {
   };
 
   return (
-    <Button variant="ghost" size="icon" onClick={copyToClipboard} className="h-8 w-8 text-muted-foreground hover:text-foreground">
+    <Button variant="ghost" size="sm" onClick={copyToClipboard} className="text-muted-foreground hover:text-foreground">
       {hasCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-      <span className="sr-only">Copy command</span>
+      <span className="ml-2">{hasCopied ? 'Copied!' : 'Copy'}</span>
     </Button>
   );
 }
@@ -41,9 +42,9 @@ function ExecuteButton({ command, onExecute, isExecuting }: { command: string, o
   if (!command) return null;
 
   return (
-    <Button variant="ghost" size="icon" onClick={() => onExecute(command)} disabled={isExecuting} className="h-8 w-8 text-muted-foreground hover:text-foreground">
+    <Button variant="outline" size="sm" onClick={() => onExecute(command)} disabled={isExecuting}>
       <Play className="h-4 w-4" />
-      <span className="sr-only">Execute command</span>
+      <span className="ml-2">Execute</span>
     </Button>
   );
 }
@@ -61,14 +62,16 @@ function AssistantMessage({ text, isGenerating, type, onExecuteCommand, isExecut
 
   if (type === 'command') {
     return (
-      <div className="bg-accent/10 p-4 rounded-lg relative group border border-accent/20">
-        <div className="absolute top-2 right-2 flex opacity-0 group-hover:opacity-100 transition-opacity">
-          <ExecuteButton command={text} onExecute={onExecuteCommand} isExecuting={isExecuting} />
-          <CopyButton command={text} />
+      <div className="bg-accent/10 rounded-lg border border-accent/20">
+        <div className="p-4">
+            <pre className="text-sm font-code whitespace-pre-wrap text-accent-foreground/90">
+            <code className="language-bash">{text}</code>
+            </pre>
         </div>
-        <pre className="text-sm font-code whitespace-pre-wrap text-accent-foreground/90">
-          <code className="language-bash">{text}</code>
-        </pre>
+        <div className="border-t border-accent/20 px-4 py-2 flex items-center justify-end gap-2">
+          <CopyButton command={text} />
+          <ExecuteButton command={text} onExecute={onExecuteCommand} isExecuting={isExecuting} />
+        </div>
       </div>
     );
   }
