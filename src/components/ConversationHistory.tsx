@@ -84,8 +84,8 @@ function AssistantMessage({ text, isGenerating, type, onExecuteCommand, isExecut
 
   if (type === 'execution') {
     return (
-      <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
-        <pre className="text-sm font-code whitespace-pre-wrap text-gray-300">
+      <div className="bg-secondary p-4 rounded-lg border">
+        <pre className="text-sm font-code whitespace-pre-wrap text-secondary-foreground">
           <code>{text}</code>
         </pre>
       </div>
