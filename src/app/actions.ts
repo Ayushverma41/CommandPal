@@ -44,7 +44,9 @@ export async function getCommand(userInput: string, commandHistory: string[]) {
 export async function executeCommand() {
   try {
     const filePath = path.join(process.cwd(), 'command.bat');
-    const { stdout, stderr } = await execAsync(filePath);
+    // Wrap the file path in double quotes to handle paths with spaces.
+    const command = `"${filePath}"`;
+    const { stdout, stderr } = await execAsync(command);
     if (stderr) {
       // If there's an error, return the error message
       return stderr;
