@@ -3,7 +3,7 @@
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Bot, User, Copy, Check, Play } from 'lucide-react';
+import { Bot, User, Copy, Check, Play, LoaderCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
@@ -49,7 +49,7 @@ function ExecuteButton({ command, onExecute, isExecuting }: { command: string, o
 
   return (
     <Button variant="outline" size="sm" onClick={() => onExecute(command)} disabled={isExecuting}>
-      <Play className="h-4 w-4" />
+      {isExecuting ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
       <span className="ml-2">Execute</span>
     </Button>
   );

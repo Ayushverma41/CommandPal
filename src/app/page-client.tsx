@@ -87,16 +87,17 @@ export default function ClientPage() {
       role: 'assistant',
       text: '',
       isGenerating: true,
+      type: 'execution'
     };
     
     const updatedMessages = [...(activeConversation.messages || []), newAssistantMessage];
     updateConversation(activeConversation.id, { messages: updatedMessages });
 
     try {
-      const result = await executeCommand(command);
+      const result = await executeCommand();
        const finalMessages = updatedMessages.map((m) =>
         m.id === assistantMessageId
-          ? { ...m, text: result, type: 'execution', isGenerating: false }
+          ? { ...m, text: result || "Command executed successfully (no output).", type: 'execution', isGenerating: false }
           : m
       );
       updateConversation(activeConversation.id, { messages: finalMessages });

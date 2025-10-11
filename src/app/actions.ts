@@ -2,9 +2,12 @@
 
 import { interpretUserInput } from '@/ai/flows/interpret-user-input-for-command';
 import { z } from 'zod';
-import { executeCommand as executeCommandFlow } from '@/ai/flows/execute-command-flow';
 import fs from 'fs/promises';
 import path from 'path';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 const CommandOutputSchema = z.object({
   type: z.enum(['command', 'conversation']),
@@ -18,17 +21,16 @@ export async function getCommand(userInput: string, commandHistory: string[]) {
       commandHistory,
     });
     
-    // Validate the output from the AI model
     const validatedResult = CommandOutputSchema.parse(result);
 
-    // If a command was generated, write it to the batch file
     if (validatedResult.type === 'command') {
       try {
         const filePath = path.join(process.cwd(), 'command.bat');
+        // For Windows, commands are separated by newlines.
+        // We add @echo off to prevent the commands themselves from being printed.
         await fs.writeFile(filePath, `@echo off\n${validatedResult.response}`);
       } catch (writeError) {
         console.error('Failed to write to command.bat:', writeError);
-        // We don't throw here because the primary function (returning the command) succeeded.
       }
     }
 
@@ -39,12 +41,19 @@ export async function getCommand(userInput: string, commandHistory: string[]) {
   }
 }
 
-export async function executeCommand(command: string) {
+export async function executeCommand() {
   try {
-    const result = await executeCommandFlow(command);
-    return result;
-  } catch (error) {
-    console.error('Error executing command:', error);
-    throw new Error('Failed to execute command via AI model.');
+    const filePath = path.join(process.cwd(), 'command.bat');
+    const { stdout, stderr } = await execAsync(filePath);
+    if (stderr) {
+      // If there's an error, return the error message
+      return stderr;
+    }
+    // Return the standard output of the command
+    return stdout;
+  } catch (error: any) {
+    console.error('Error executing command.bat:', error);
+    // Return the error message from the exception
+    return error.stderr || error.stdout || error.message || 'Failed to execute command.';
   }
 }
