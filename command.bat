@@ -1,2 +1,2 @@
 @echo off
-copy d:\abc.txt c:\
+mkdir ~/Desktop/abc
