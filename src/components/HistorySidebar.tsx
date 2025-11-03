@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 type HistorySidebarProps = {
@@ -27,6 +28,7 @@ type HistorySidebarProps = {
   onNewConversation: () => void;
   onDeleteConversation: (id: string) => void;
   onClearAll: () => void;
+  isLoading: boolean;
 };
 
 export function HistorySidebar({
@@ -38,7 +40,51 @@ export function HistorySidebar({
   onNewConversation,
   onDeleteConversation,
   onClearAll,
+  isLoading,
 }: HistorySidebarProps) {
+  
+  const HistoryList = () => {
+    if (isLoading) {
+      return (
+        <div className="space-y-1 p-2">
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-9 w-full" />
+        </div>
+      );
+    }
+
+    return (
+      <ScrollArea className="flex-1 px-2">
+        <div className="space-y-1">
+          {conversations.map((convo) => (
+            <div key={convo.id} className="group relative">
+              <Button
+                variant={activeConversationId === convo.id ? 'secondary' : 'ghost'}
+                className="w-full justify-start pr-10"
+                onClick={() => onSelectConversation(convo.id)}
+              >
+                <MessageSquare className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span className="truncate flex-1 text-left">{convo.title}</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 opacity-0 group-hover:opacity-100"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteConversation(convo.id);
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+    );
+  };
+
   return (
     <>
       <div
@@ -65,41 +111,15 @@ export function HistorySidebar({
         </div>
 
         <div className="p-2">
-          <Button variant="outline" className="w-full justify-start" onClick={onNewConversation}>
+          <Button variant="outline" className="w-full justify-start" onClick={onNewConversation} disabled={isLoading}>
             <Plus className="mr-2 h-4 w-4" />
             New Chat
           </Button>
         </div>
 
-        <ScrollArea className="flex-1 px-2">
-          <div className="space-y-1">
-            {conversations.map((convo) => (
-              <div key={convo.id} className="group relative">
-                <Button
-                  variant={activeConversationId === convo.id ? 'secondary' : 'ghost'}
-                  className="w-full justify-start pr-10"
-                  onClick={() => onSelectConversation(convo.id)}
-                >
-                  <MessageSquare className="mr-2 h-4 w-4 flex-shrink-0" />
-                  <span className="truncate flex-1 text-left">{convo.title}</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 opacity-0 group-hover:opacity-100"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDeleteConversation(convo.id);
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
+        <HistoryList />
         
-        {conversations.length > 0 && (
+        {conversations.length > 0 && !isLoading && (
           <div className="p-4 border-t">
               <AlertDialog>
                 <AlertDialogTrigger asChild>

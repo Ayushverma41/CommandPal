@@ -9,12 +9,14 @@ import { HistorySidebar } from '@/components/HistorySidebar';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 import { ModeToggle } from '@/components/mode-toggle';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ClientPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const {
     conversations,
     activeConversation,
+    isLoading,
     setActiveConversation,
     startNewConversation,
     updateConversation,
@@ -119,6 +121,41 @@ export default function ClientPage() {
     }
   };
 
+  const MainContent = () => {
+    if (isLoading) {
+      return (
+        <div className="space-y-8">
+          <div className="flex items-start gap-4">
+            <Skeleton className="h-9 w-9 rounded-full" />
+            <div className="flex-1 space-y-2 pt-0.5">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-full" />
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <Skeleton className="h-9 w-9 rounded-full" />
+            <div className="flex-1 space-y-2 pt-0.5">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <ConversationHistory
+          messages={activeConversation?.messages || []}
+          onExecuteCommand={handleExecuteCommand}
+          isExecuting={isExecuting}
+        />
+        <div ref={conversationEndRef} />
+      </>
+    );
+  };
+
+
   return (
     <div className="flex h-screen bg-background text-foreground">
       <HistorySidebar
@@ -130,6 +167,7 @@ export default function ClientPage() {
         onNewConversation={startNewConversation}
         onDeleteConversation={deleteConversation}
         onClearAll={clearAllConversations}
+        isLoading={isLoading}
       />
       <div className="flex flex-col flex-1">
         <header className="flex items-center justify-between p-4 border-b shrink-0">
@@ -148,18 +186,13 @@ export default function ClientPage() {
         
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <div className="max-w-3xl mx-auto w-full">
-            <ConversationHistory
-              messages={activeConversation?.messages || []}
-              onExecuteCommand={handleExecuteCommand}
-              isExecuting={isExecuting}
-            />
-            <div ref={conversationEndRef} />
+            <MainContent />
           </div>
         </main>
 
         <footer className="p-4 border-t bg-background shrink-0">
           <div className="max-w-3xl mx-auto">
-            <CommandForm onSubmit={handleNewMessage} isGenerating={isGenerating} />
+            <CommandForm onSubmit={handleNewMessage} isGenerating={isGenerating || isLoading} />
             <p className="text-xs text-center text-muted-foreground mt-2">
               CommandPal can make mistakes. Consider checking important commands.
             </p>

@@ -26,7 +26,6 @@ export function CommandForm({ onSubmit, isGenerating }: CommandFormProps) {
     },
   });
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const { ref: fieldRef, ...fieldRest } = form.register('prompt');
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     await onSubmit(values.prompt);
@@ -67,6 +66,7 @@ export function CommandForm({ onSubmit, isGenerating }: CommandFormProps) {
                     target.style.height = 'auto';
                     target.style.height = `${target.scrollHeight}px`;
                   }}
+                  disabled={isGenerating}
                 />
               </FormControl>
             </FormItem>
