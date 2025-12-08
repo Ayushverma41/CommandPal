@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Wand2, Loader2, Copy, Save, Play, Terminal } from 'lucide-react';
+import { Wand2, Loader2, Copy, Play, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -185,7 +185,7 @@ export default function NaturalLanguageForm() {
                  {(isExecuting || executionResult) && (
                   <Alert>
                     <Terminal className="h-4 w-4" />
-                    <AlertTitle>Execution Environment</AlertTitle>
+                    <AlertTitle>Execution Result</AlertTitle>
                     <AlertDescription>
                       <div className="p-4 bg-background rounded-md font-code text-sm mt-2 whitespace-pre-wrap">
                         {isExecuting && (
