@@ -20,7 +20,8 @@ export async function handleNaturalLanguageToCommand(
   try {
     const result = await convertNaturalLanguageToCommand(input);
     const commandBatPath = path.join(process.cwd(), 'Command.bat');
-    await fs.writeFile(commandBatPath, result.command);
+    const formattedCommand = `@echo off\n${result.command}\n\necho.\npause`;
+    await fs.writeFile(commandBatPath, formattedCommand);
     return { data: result };
   } catch (error) {
     console.error(error);
@@ -34,7 +35,8 @@ export async function handleExplainCommand(
   try {
     const result = await explainCommand(input);
     const commandBatPath = path.join(process.cwd(), 'Command.bat');
-    await fs.writeFile(commandBatPath, input.command);
+    const formattedCommand = `@echo off\n${input.command}\n\necho.\npause`;
+    await fs.writeFile(commandBatPath, formattedCommand);
     return { data: result };
   } catch (error) {
     console.error(error);

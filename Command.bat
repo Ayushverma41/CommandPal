@@ -1,5 +1,1 @@
-@echo off
-robocopy "%USERPROFILE%\Desktop\abc" "%USERPROFILE%\Downloads\abc" /E
-
-echo.
-pause
+xcopy "C:\Users\%USERNAME%\Desktop\abc" "C:\Users\%USERNAME%\Downloads" /E /I
