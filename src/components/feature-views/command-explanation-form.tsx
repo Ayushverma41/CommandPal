@@ -42,21 +42,6 @@ export default function CommandExplanationForm() {
     toast({ title: 'Explanation copied to clipboard!' });
   };
 
-  const onSaveCommandToFile = () => {
-    const command = form.getValues().command;
-    if (!command) return;
-    const blob = new Blob([command], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Command.bat';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast({ title: 'Command saved to Command.bat' });
-  };
-
   const onCopyCommand = () => {
     const command = form.getValues().command;
     if (!command) return;
@@ -174,10 +159,6 @@ export default function CommandExplanationForm() {
                       <Button variant="outline" size="sm" onClick={onCopyCommand}>
                         <Copy />
                         Copy Command
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={onSaveCommandToFile}>
-                        <Save />
-                        Save to file
                       </Button>
                       <Button variant="outline" size="sm" onClick={onExecute} disabled={isExecuting}>
                         {isExecuting ? <Loader2 className="animate-spin" /> : <Play />}

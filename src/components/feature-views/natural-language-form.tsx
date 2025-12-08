@@ -45,20 +45,6 @@ export default function NaturalLanguageForm() {
     navigator.clipboard.writeText(result);
     toast({ title: 'Copied to clipboard!' });
   };
-  
-  const onSaveToFile = () => {
-    if (!result) return;
-    const blob = new Blob([result], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Command.bat';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast({ title: 'Command saved to Command.bat' });
-  };
 
   const onExecute = async () => {
     if (!result) return;
@@ -187,10 +173,6 @@ export default function NaturalLanguageForm() {
                         <Button variant="outline" size="sm" onClick={onCopy}>
                         <Copy />
                         Copy
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={onSaveToFile}>
-                        <Save />
-                        Save to file
                         </Button>
                          <Button variant="outline" size="sm" onClick={onExecute} disabled={isExecuting}>
                             {isExecuting ? <Loader2 className="animate-spin" /> : <Play />}
