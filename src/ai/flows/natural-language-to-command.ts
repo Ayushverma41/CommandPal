@@ -5,8 +5,6 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import fs from 'fs/promises';
-import path from 'path';
 
 const ConvertNaturalLanguageToCommandInputSchema = z.object({
   naturalLanguageQuery: z.string(),
@@ -47,24 +45,6 @@ const convertNaturalLanguageToCommandFlow = ai.defineFlow(
   },
   async input => {
     const { output } = await prompt(input);
-    const command = output!.command;
-
-    try {
-      // Build .bat file content
-      const batContent =
-        `@echo off\r\n` +
-        `${command}\r\n\r\n` +
-        `echo.\r\npause`;
-
-      const filePath = path.join(process.cwd(), 'Command.bat');
-
-      await fs.writeFile(filePath, batContent, 'utf8');
-
-      console.log(`Command.bat created successfully at ${filePath}`);
-    } catch (err) {
-      console.error("Failed to write Command.bat:", err);
-    }
-
     return output!;
   }
 );
