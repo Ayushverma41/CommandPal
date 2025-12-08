@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Wand2, Loader2, Copy, Save } from 'lucide-react';
+import { Wand2, Loader2, Copy, Save, Play, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -15,6 +15,7 @@ import { handleNaturalLanguageToCommand } from '@/app/actions';
 import CodeBlock from '@/components/common/code-block';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { CommandEntry } from '@/lib/types';
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
 const formSchema = z.object({
   naturalLanguageQuery: z.string().min(10, 'Please enter a more descriptive query.'),
@@ -26,6 +27,7 @@ type FormValues = z.infer<typeof formSchema>;
 export default function NaturalLanguageForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState('');
+  const [showExecution, setShowExecution] = useState(false);
   const [history, setHistory] = useLocalStorage<CommandEntry[]>('command-history', []);
   const { toast } = useToast();
 
@@ -56,10 +58,16 @@ export default function NaturalLanguageForm() {
     URL.revokeObjectURL(url);
     toast({ title: 'Command saved to Command.bat' });
   };
+  
+  const onExecute = () => {
+    setShowExecution(true);
+    toast({ title: 'Simulating command execution' });
+  };
 
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     setResult('');
+    setShowExecution(false);
 
     const response = await handleNaturalLanguageToCommand(values);
     setIsLoading(false);
@@ -149,23 +157,52 @@ export default function NaturalLanguageForm() {
             </Button>
           </form>
         </Form>
-        {result && (
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">Generated Command:</h3>
-              <CodeBlock code={result} />
-              <div className="flex items-center gap-2 mt-2">
-                <Button variant="outline" size="sm" onClick={onCopy}>
-                  <Copy />
-                  Copy
-                </Button>
-                <Button variant="outline" size="sm" onClick={onSaveToFile}>
-                  <Save />
-                  Save to file
-                </Button>
-              </div>
+        {(isLoading || result) && (
+            <div className="mt-6 space-y-4 border-t pt-6">
+                {isLoading && (
+                    <div className='flex items-center gap-2 text-muted-foreground'>
+                        <Loader2 className='animate-spin' />
+                        <span>Generating your command...</span>
+                    </div>
+                )}
+                {result && (
+                <div className="space-y-4">
+                    <div>
+                    <h3 className="font-semibold mb-2">Generated Command:</h3>
+                    <CodeBlock code={result} />
+                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                        <Button variant="outline" size="sm" onClick={onCopy}>
+                        <Copy />
+                        Copy
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={onSaveToFile}>
+                        <Save />
+                        Save to file
+                        </Button>
+                         <Button variant="outline" size="sm" onClick={onExecute}>
+                        <Play />
+                        Execute
+                        </Button>
+                    </div>
+                    </div>
+
+                    {showExecution && (
+                    <Alert>
+                        <Terminal className="h-4 w-4" />
+                        <AlertTitle>Execution Environment</AlertTitle>
+                        <AlertDescription>
+                            <p className="font-semibold mb-2 mt-4">Simulated Execution:</p>
+                            <div className="p-4 bg-black text-white rounded-md font-code text-sm">
+                            <p className='text-green-400'>$ {result}</p>
+                            <p>Command execution simulation is not yet implemented.</p>
+                            <p>Directly executing commands from a web browser is a security risk. This feature will simulate command output in a safe, sandboxed environment.</p>
+                            </div>
+                        </AlertDescription>
+                        </Alert>
+                    )}
+                </div>
+                )}
             </div>
-          </div>
         )}
       </CardContent>
     </Card>
