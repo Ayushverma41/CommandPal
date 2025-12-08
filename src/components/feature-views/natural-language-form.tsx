@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Wand2, Loader2 } from 'lucide-react';
+import { Wand2, Loader2, Copy, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -36,6 +36,20 @@ export default function NaturalLanguageForm() {
       operatingSystem: 'Linux',
     },
   });
+
+  const onCopy = () => {
+    if (!result) return;
+    navigator.clipboard.writeText(result);
+    toast({ title: 'Copied to clipboard!' });
+  };
+  
+  const onExecute = () => {
+    toast({
+      variant: 'destructive',
+      title: 'Execute not implemented',
+      description: 'This functionality is not yet available.',
+    });
+  };
 
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
@@ -133,6 +147,16 @@ export default function NaturalLanguageForm() {
           <div className="space-y-2">
             <h3 className="font-semibold">Generated Command:</h3>
             <CodeBlock code={result} />
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={onCopy}>
+                <Copy />
+                Copy
+              </Button>
+              <Button variant="outline" size="sm" onClick={onExecute}>
+                <Play />
+                Execute
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>

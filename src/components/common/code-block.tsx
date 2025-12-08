@@ -32,9 +32,9 @@ export default function CodeBlock({ code, className }: CodeBlockProps) {
         variant="ghost"
         className="absolute top-2 right-2 h-7 w-7 text-card-foreground/70 hover:text-card-foreground"
         onClick={onCopy}
+        aria-label="Copy code"
       >
         {hasCopied ? <Check className="size-4" /> : <Copy className="size-4" />}
-        <span className="sr-only">Copy code</span>
       </Button>
       <pre className="whitespace-pre-wrap break-words">
         <code>{code}</code>

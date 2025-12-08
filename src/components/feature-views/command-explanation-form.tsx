@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { FileQuestion, Loader2 } from 'lucide-react';
+import { FileQuestion, Loader2, Copy, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -32,6 +32,20 @@ export default function CommandExplanationForm() {
       command: '',
     },
   });
+
+  const onCopy = () => {
+    if (!result) return;
+    navigator.clipboard.writeText(result);
+    toast({ title: 'Copied to clipboard!' });
+  };
+  
+  const onExecute = () => {
+    toast({
+      variant: 'destructive',
+      title: 'Execute not implemented',
+      description: 'This functionality is not yet available.',
+    });
+  };
 
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
@@ -103,6 +117,16 @@ export default function CommandExplanationForm() {
             <h3 className="font-semibold">Explanation:</h3>
             <div className="prose prose-invert prose-sm max-w-none text-foreground p-4 bg-card rounded-md border">
               <p>{result}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={onCopy}>
+                <Copy />
+                Copy
+              </Button>
+              <Button variant="outline" size="sm" onClick={onExecute}>
+                <Play />
+                Execute
+              </Button>
             </div>
           </div>
         )}
