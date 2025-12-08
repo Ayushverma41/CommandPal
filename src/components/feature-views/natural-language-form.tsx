@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { handleNaturalLanguageToCommand, handleExecuteCommand } from '@/app/actions';
+import { handleNaturalLanguageToCommand } from '@/app/actions';
 import CodeBlock from '@/components/common/code-block';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { CommandEntry } from '@/lib/types';
@@ -26,10 +26,8 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function NaturalLanguageForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [isExecuting, setIsExecuting] = useState(false);
   const [result, setResult] = useState('');
   const [showExecution, setShowExecution] = useState(false);
-  const [executionOutput, setExecutionOutput] = useState<{ stdout: string; stderr: string } | null>(null);
   const [history, setHistory] = useLocalStorage<CommandEntry[]>('command-history', []);
   const { toast } = useToast();
 
@@ -61,32 +59,15 @@ export default function NaturalLanguageForm() {
     toast({ title: 'Command saved to Command.bat' });
   };
   
-  const onExecute = async () => {
-    setIsExecuting(true);
+  const onExecute = () => {
     setShowExecution(true);
-    setExecutionOutput(null);
-
-    const response = await handleExecuteCommand();
-    setIsExecuting(false);
-
-    if (response.error || !response.data) {
-        toast({
-            variant: 'destructive',
-            title: 'Execution Failed',
-            description: response.error,
-        });
-        setExecutionOutput({ stdout: '', stderr: response.error || 'An unknown error occurred.' });
-    } else {
-        toast({ title: 'Command executed successfully' });
-        setExecutionOutput(response.data);
-    }
+    toast({ title: 'Simulating command execution' });
   };
 
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     setResult('');
     setShowExecution(false);
-    setExecutionOutput(null);
 
     const response = await handleNaturalLanguageToCommand(values);
     setIsLoading(false);
@@ -198,8 +179,8 @@ export default function NaturalLanguageForm() {
                         <Save />
                         Save to file
                         </Button>
-                         <Button variant="outline" size="sm" onClick={onExecute} disabled={isExecuting}>
-                            {isExecuting ? <Loader2 className="animate-spin" /> : <Play />}
+                         <Button variant="outline" size="sm" onClick={onExecute}>
+                            <Play />
                             Execute
                         </Button>
                     </div>
@@ -210,12 +191,11 @@ export default function NaturalLanguageForm() {
                         <Terminal className="h-4 w-4" />
                         <AlertTitle>Execution Environment</AlertTitle>
                         <AlertDescription>
-                            <p className="font-semibold mb-2 mt-4">Execution Output:</p>
-                            <div className="p-4 bg-black text-white rounded-md font-code text-sm whitespace-pre-wrap">
-                            <p className='text-green-400'>$ ./Command.bat</p>
-                             {isExecuting && <div className='flex items-center gap-2'><Loader2 className='animate-spin' /><span>Executing...</span></div>}
-                            {executionOutput?.stdout && <p>{executionOutput.stdout}</p>}
-                            {executionOutput?.stderr && <p className='text-red-400'>{executionOutput.stderr}</p>}
+                            <p className="font-semibold mb-2 mt-4">Simulated Execution:</p>
+                            <div className="p-4 bg-background rounded-md font-code text-sm">
+                            <p className='text-green-400'>$ {result}</p>
+                            <p>Command execution simulation is not yet implemented.</p>
+                            <p>Directly executing commands from a web browser is a security risk. This feature will simulate command output in a safe, sandboxed environment.</p>
                             </div>
                         </AlertDescription>
                         </Alert>
