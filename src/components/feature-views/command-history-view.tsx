@@ -1,5 +1,7 @@
+
 "use client";
 
+import { useState } from 'react';
 import { History, Trash2, Wand2, FileQuestion } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -18,7 +20,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
+const ITEMS_PER_PAGE = 5;
 
 function HistoryItem({ item }: { item: CommandEntry }) {
   const isExplain = item.type === 'explain';
@@ -59,10 +69,26 @@ function HistoryItem({ item }: { item: CommandEntry }) {
 
 export default function CommandHistoryView() {
   const [history, setHistory] = useLocalStorage<CommandEntry[]>('command-history', []);
+  const [currentPage, setCurrentPage] = useState(0);
 
   const handleClearHistory = () => {
     setHistory([]);
+    setCurrentPage(0);
   };
+
+  const totalPages = Math.ceil(history.length / ITEMS_PER_PAGE);
+  const startIndex = currentPage * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentHistory = history.slice(startIndex, endIndex);
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 0));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
+  };
+
 
   return (
     <Card>
@@ -102,7 +128,7 @@ export default function CommandHistoryView() {
       <CardContent>
         {history.length > 0 ? (
           <div className="space-y-4">
-            {history.map((item) => (
+            {currentHistory.map((item) => (
               <HistoryItem key={item.id} item={item} />
             ))}
           </div>
@@ -112,6 +138,23 @@ export default function CommandHistoryView() {
             <h3 className="text-lg font-semibold">No history yet</h3>
             <p>Your generated commands will appear here.</p>
           </div>
+        )}
+        {totalPages > 1 && (
+            <Pagination className="mt-6">
+                <PaginationContent>
+                    <PaginationItem>
+                        <PaginationPrevious onClick={handlePreviousPage} disabled={currentPage === 0}/>
+                    </PaginationItem>
+                    <PaginationItem>
+                        <span className="text-sm text-muted-foreground">
+                            Page {currentPage + 1} of {totalPages}
+                        </span>
+                    </PaginationItem>
+                    <PaginationItem>
+                        <PaginationNext onClick={handleNextPage} disabled={currentPage >= totalPages - 1}/>
+                    </PaginationItem>
+                </PaginationContent>
+            </Pagination>
         )}
       </CardContent>
     </Card>
