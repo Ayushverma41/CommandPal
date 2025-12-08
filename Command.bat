@@ -1,1 +1,5 @@
-IF NOT EXIST "%USERPROFILE%\Desktop\abc" MKDIR "%USERPROFILE%\Desktop\abc"
+@echo off
+robocopy "%USERPROFILE%\Desktop\abc" "%USERPROFILE%\Downloads\abc" /E
+
+echo.
+pause
