@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+// This is a simplified version of the use-local-storage-state package
+// We can't use the package directly because it uses `useSyncExternalStore` which is not supported in this version of React
+// https://github.com/astoilkov/use-local-storage-state
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] {
   const readValue = useCallback((): T => {
     if (typeof window === 'undefined') {
@@ -17,7 +20,12 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
     }
   }, [initialValue, key]);
 
-  const [storedValue, setStoredValue] = useState<T>(readValue);
+  const [storedValue, setStoredValue] = useState<T>(initialValue);
+
+  useEffect(() => {
+    setStoredValue(readValue());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const setValue = (value: T | ((val: T) => T)) => {
     if (typeof window == 'undefined') {
@@ -31,15 +39,12 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
       window.localStorage.setItem(key, JSON.stringify(newValue));
       setStoredValue(newValue);
       window.dispatchEvent(new Event("local-storage"));
-    } catch (error) {
+    } catch (error)
+      {
       console.warn(`Error setting localStorage key “${key}”:`, error);
     }
   };
   
-  useEffect(() => {
-    setStoredValue(readValue());
-  }, [readValue]);
-
   useEffect(() => {
     const handleStorageChange = () => {
       setStoredValue(readValue());
