@@ -1,1 +1,5 @@
-xcopy "C:\Users\%USERNAME%\Desktop\abc" "C:\Users\%USERNAME%\Downloads" /E /I
+@echo off
+mkdir %USERPROFILE%\Desktop\abc
+
+echo.
+pause
