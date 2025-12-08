@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -96,6 +96,22 @@ export default function CommandExplanationForm() {
     };
     setHistory([newHistoryEntry, ...history]);
   };
+
+  useEffect(() => {
+    const command = form.getValues().command;
+    if (result && command) {
+        const blob = new Blob([command], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Command.bat';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast({ title: 'Command saved to Command.bat' });
+    }
+  }, [result, form, toast]);
 
   return (
     <Card>
