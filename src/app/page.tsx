@@ -21,6 +21,7 @@ import CommandExplanationForm from '@/components/feature-views/command-explanati
 import CommandHistoryView from '@/components/feature-views/command-history-view';
 import SavedCommandsView from '@/components/feature-views/saved-commands-view';
 import { Separator } from '@/components/ui/separator';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 
 const menuItems = [
   { id: 'natural-language', label: 'Natural Language', icon: Wand2 },
@@ -78,9 +79,13 @@ export default function Home() {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset className="flex flex-col">
-        <header className="flex items-center gap-4 border-b bg-background/50 backdrop-blur-sm p-2 md:hidden">
-          <SidebarTrigger />
-          <Logo />
+        <header className="flex items-center justify-between gap-4 border-b bg-background/50 backdrop-blur-sm p-2">
+            <div className='flex items-center gap-4 md:hidden'>
+              <SidebarTrigger />
+              <Logo />
+            </div>
+            <div className='hidden md:block' />
+            <ThemeSwitcher />
         </header>
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="max-w-4xl mx-auto">
