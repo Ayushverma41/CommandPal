@@ -43,7 +43,15 @@ GEMINI_API_KEY=YOUR_API_KEY
 
 ### 3. Run the Application
 
-This application consists of two separate parts that need to run simultaneously: the Next.js frontend and the Genkit AI service. You will need to open **two separate terminal windows** for this.
+You can start the application using the provided batch file or by running the commands manually.
+
+#### Easy Way (Single Click)
+
+Simply double-click the `run.bat` file in the project's root directory. This will automatically open two new command prompt windows: one for the AI service and one for the frontend application.
+
+#### Manual Way
+
+If you prefer to run the services manually, you will need to open **two separate terminal windows**.
 
 **In your first terminal**, run the Genkit AI service:
 
